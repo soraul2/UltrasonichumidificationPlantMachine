@@ -4,8 +4,6 @@
 #include "WaterSensor.h"
 #include "MotorController.h"
 
-UltrasonichumidificationPlantMachine
-
 #define humidifier_pin 3
 #define dht_pin 4
 #define led_pin 5
@@ -25,10 +23,14 @@ UltrasonichumidificationPlantMachine
 //(최저 온도 , 최대 온도 , 최저 습도 , 최대 습도 , 시작 시간 , 종료 시간)
 Enviroment enviroment(20.0, 25.0, 75, 85, 6, 19);
 
+//가습기 컨트롤러 객체 생성
 HumidifierController humidifierController(&enviroment, humidifier_pin, dht_pin);
+//LED ON OFF 컨트롤러 객체 생성
 Led_OnOff_Controller led_OnOff_Controller(&enviroment, led_pin, clk, dat, rst);
 
+//수위 센서 객체 생성
 WaterSensor waterSensor(waterSensor_pin);
+//펌프 컨트롤러 객체 생성
 MotorController motorController(motor_pin,motor_power);
 //millis 관련 코드 ------------------------------
   
@@ -42,9 +44,6 @@ MotorController motorController(motor_pin,motor_power);
   
   
 //millis 관련 코드-------------------------------
-
-
-
 
 void setup() {
   Serial.begin(9600);
@@ -71,13 +70,11 @@ void loop() {
   if(currentMillis-previous_waterTankTime >= interval_waterTankTime){
     previous_waterTankTime = currentMillis;
     
-    Serial.println(waterSensor.getValue());
-
     //수위센서에 물이 닿지 않으면 motor ON
-    if(waterSensor.getValue() <= 0){
+    if(waterSensor.getValue() <= 20){ // -n ~ 20 , 20까지는 습도 보정 값
       motorController.turnOn();
     //수위센서에 물이 닿으면 motor OFF
-    }else{
+    }else{ //20 ~ n
       motorController.turnOff();
     }
 

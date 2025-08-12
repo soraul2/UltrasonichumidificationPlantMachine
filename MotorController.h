@@ -7,7 +7,6 @@ class MotorController{
   public :
     MotorController(int motor_pin , int motor_power);
       
-
     void turnOn();
     void turnOff();
 
