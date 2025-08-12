@@ -5,24 +5,22 @@
 #include "Enviroment.h"
 #include <DHT.h>
 
-// DHT 센서 타입 정의
 #define DHTTYPE DHT11
 
 class HumidifierController {
 public:
-    // 생성자 매개변수 및 멤버 이니셜라이저 리스트 수정
     HumidifierController(Enviroment* idealEnviroment, int humidifierPin, int dhtSensorPin)
       : _idealEnviroment(idealEnviroment), 
         _humidifierPin(humidifierPin), 
         _dhtSensorPin(dhtSensorPin),
         dht(_dhtSensorPin, DHTTYPE)
     {
-        // 생성자 본문에서는 멤버 변수 초기화 외의 다른 로직은 최소화
         pinMode(_humidifierPin, OUTPUT);
         dht.begin();
     }
 
     void control() {
+        // control() 함수에서 한 번만 센서 값을 읽고 멤버 변수에 저장
         _current_humidity = dht.readHumidity();
         _current_temperature = dht.readTemperature();
 
@@ -56,12 +54,22 @@ public:
         // Serial.println("가습기 OFF");
     }
 
+    // 수정된 Getter 함수: 저장된 값을 반환만 합니다.
+    float getTemperature() {
+        return _current_temperature;
+    }
+
+    // 수정된 Getter 함수: 저장된 값을 반환만 합니다.
+    float getHumidity() {
+        return _current_humidity;
+    }
+
 private:
     Enviroment* _idealEnviroment;
     float _current_temperature;
     float _current_humidity;
-    int _dhtSensorPin; // dht 센서 핀
-    int _humidifierPin; // 가습기 핀
+    int _dhtSensorPin;
+    int _humidifierPin;
     DHT dht;
 };
 
