@@ -54,15 +54,6 @@ public:
         // Serial.println("가습기 OFF");
     }
 
-    // 수정된 Getter 함수: 저장된 값을 반환만 합니다.
-    float getTemperature() {
-        return _current_temperature;
-    }
-
-    // 수정된 Getter 함수: 저장된 값을 반환만 합니다.
-    float getHumidity() {
-        return _current_humidity;
-    }
 
 private:
     Enviroment* _idealEnviroment;

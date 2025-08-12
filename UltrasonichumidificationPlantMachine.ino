@@ -3,7 +3,7 @@
 #include "Led_OnOff_Controller.h"
 #include "WaterSensor.h"
 #include "MotorController.h"
-#include "LCD_Display.h"
+#include "TempHumi_Controller.h"
 
 #define humidifier_pin 3
 #define dht_pin 4
@@ -29,22 +29,19 @@ HumidifierController humidifierController(&enviroment, humidifier_pin, dht_pin);
 //LED ON OFF 컨트롤러 객체 생성
 Led_OnOff_Controller led_OnOff_Controller(&enviroment, led_pin, clk, dat, rst);
 
-//LCD_Display 객체 생성
-//uint8_t lcd_addr , uint8_t lcd_cols, uint8_t lcd_rows
-LCD_Display lcd_display_controller(0x27,16,2);
-
 //수위 센서 객체 생성
 WaterSensor waterSensor(waterSensor_pin);
 //펌프 컨트롤러 객체 생성
 MotorController motorController(motor_pin,motor_power);
+
+TempHumi_Controller tempHumi_Controller(dht_pin);
+
 //millis 관련 코드 ------------------------------
 
   unsigned long previous_ledTime = 0;
   unsigned long previous_humidifierTime = 0;
   unsigned long previous_waterTankTime = 0;
-  unsigned long previous_lcdDisplayTime = 0;
 
-  const ling interval_lcdDisplayTime = 1000;
   const long interval_humidifierTime = 3000;
   const long interval_ledTime = 5000;
   const long interval_waterTankTime = 5000;
@@ -56,26 +53,17 @@ void setup() {
   Serial.begin(9600);
   Serial.println("가습기 제어 시스템을 시작합니다.");
   Serial.println("Led 제어 시스템을 시작합니다.");
+
+
+  Serial.println("TempHumi Controller Initialized!");
+
+  tempHumi_Controller.setup();
   delay(2000);  //센서가 안정될 시간
 }
 
 void loop() {
 
   unsigned long currentMillis = millis();
-
-  //온 습도 LCD 출력
-  if(currentMillis-previous_lcdDisplayTime >= interval_lcdDisplayTime){
-    previous_lcdDisplayTime = currentMillis;
-
-    char temperature_str[10];
-    char humidity_str[10];
-
-    sprintf(temperature_str, "Temp: %.2f C", humidifierController.getTemperature());
-    sprintf(humidity_str, "Humid:%.2f %%", humidifierController.getHumidity());
-
-    lcd_display_controller.showMessage(temperature_str,humidity_str);
-    
-  }
 
   //시간에 따른 LED 제어
   if(currentMillis-previous_ledTime >= interval_ledTime){
