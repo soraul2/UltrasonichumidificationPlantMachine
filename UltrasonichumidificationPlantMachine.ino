@@ -3,6 +3,10 @@
 #include "Led_OnOff_Controller.h"
 #include "WaterSensor.h"
 #include "MotorController.h"
+<<<<<<< HEAD
+=======
+#include "TempHumi_Controller.h"
+>>>>>>> 67e4f629e98fbf7f7bc923ab68f63c45e8d42362
 
 #define humidifier_pin 3
 #define dht_pin 4
@@ -32,6 +36,9 @@ Led_OnOff_Controller led_OnOff_Controller(&enviroment, led_pin, clk, dat, rst);
 WaterSensor waterSensor(waterSensor_pin);
 //펌프 컨트롤러 객체 생성
 MotorController motorController(motor_pin,motor_power);
+
+TempHumi_Controller tempHumi_Controller(dht_pin);
+
 //millis 관련 코드 ------------------------------
 
   unsigned long previous_ledTime = 0;
@@ -49,7 +56,15 @@ void setup() {
   Serial.begin(9600);
   Serial.println("가습기 제어 시스템을 시작합니다.");
   Serial.println("Led 제어 시스템을 시작합니다.");
+<<<<<<< HEAD
   
+=======
+
+
+  Serial.println("TempHumi Controller Initialized!");
+
+  tempHumi_Controller.setup();
+>>>>>>> 67e4f629e98fbf7f7bc923ab68f63c45e8d42362
   delay(2000);  //센서가 안정될 시간
 }
 
