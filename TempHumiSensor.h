@@ -5,7 +5,7 @@ public:
     TempHumiSensor(int dht_pin);
     
     void init();
-    void readSensor(); // readSensor() 메서드 추가
+    bool readSensor(); // readSensor() 메서드 추가
     float getTemperature();
     float getHumidity();
 
