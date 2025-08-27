@@ -3,10 +3,7 @@
 #include "Led_OnOff_Controller.h"
 #include "WaterSensor.h"
 #include "MotorController.h"
-<<<<<<< HEAD
-=======
 #include "TempHumi_Controller.h"
->>>>>>> 67e4f629e98fbf7f7bc923ab68f63c45e8d42362
 
 #define humidifier_pin 3
 #define dht_pin 4
