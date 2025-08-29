@@ -1,18 +1,30 @@
 #ifndef WaterSensor_h
 #define WaterSensor_h
 
+#include "Arduino.h"
+
+//with water 5
+//no water 0
+
 class WaterSensor {
 
 public:
-    // 생성자: 핀 번호를 받아 멤버 변수를 초기화합니다.
-    WaterSensor(int waterSensor_pin);
+    // digtal Pin 으로 받아야한다.
+    WaterSensor(int waterSensorPin){
+        _waterSensorPin = waterSensorPin;
+        pinMode(_waterSensorPin,INPUT);
+    }
     
-
-    // 아날로그 값을 읽어 정수형으로 반환하는 함수 (const 키워드 추가)
-    int getValue() const;
+    //touch : 1 , not touch 0
+    bool getTouchWater(){
+        _touchWater = digitalRead(_waterSensorPin);
+        Serial.println(_touchWater);
+        return _touchWater;
+    }
 
 private:
-    int _waterSensor_pin;
+    int _waterSensorPin;
+    int _touchWater;
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef HumidifierController_h
-#define HumidifierController_h
+#ifndef PlantSupplyWater_h
+#define PlantSupplyWater_h
 
 #include "Arduino.h"
 #include "Enviroment.h"
@@ -7,9 +7,9 @@
 
 #define DHTTYPE DHT11
 
-class HumidifierController {
+class PlantSupplyWater {
 public:
-    HumidifierController(Enviroment* idealEnviroment, int humidifierPin, int dhtSensorPin)
+    PlantSupplyWater(Enviroment* idealEnviroment, int humidifierPin, int dhtSensorPin)
       : _idealEnviroment(idealEnviroment), 
         _humidifierPin(humidifierPin), 
         _dhtSensorPin(dhtSensorPin),

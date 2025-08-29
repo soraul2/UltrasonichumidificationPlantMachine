@@ -1,15 +1,15 @@
-#ifndef TempHumi_Controller_h
-#define TempHumi_Controller_h
+#ifndef TempHumi_h
+#define TempHumi_h
 
 #include "Arduino.h"
 #include <DHT.h>
 
 #define DHTTYPE DHT11
 
-class TempHumi_Controller{
+class TempHumi{
 
   public :
-    TempHumi_Controller(int dht_pin);
+    TempHumi(int dht_pin);
     void setup();
     void readSensor();
 

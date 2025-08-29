@@ -1,14 +1,14 @@
-#ifndef RTCController_h
-#define RTCController_h
+#ifndef RealTime_h
+#define RealTime_h
 
 #include "Arduino.h"
 #include <ThreeWire.h>
 #include <RtcDS1302.h>
 
-class RTCController {
+class RealTime {
 public: // <-- 이 부분이 꼭 필요합니다.
     // 생성자
-    RTCController(int CLK, int DAT, int RST);
+    RealTime(int CLK, int DAT, int RST);
 
     // 공용 메서드들
     void begin();

@@ -1,10 +1,10 @@
-#include "RTCController.h"
+#include "RealTime.h"
 #include "Enviroment.h" // Enviroment 클래스 정의를 위해 추가
 
-class Led_OnOff_Controller {
+class Led {
 
 public:
-    Led_OnOff_Controller(Enviroment* enviroment, int LED_pin, int CLK, int DAT, int RST)
+    Led(Enviroment* enviroment, int LED_pin, int CLK, int DAT, int RST)
         : _enviroment(enviroment), _LED_pin(LED_pin), _rtc(CLK, DAT, RST) {
         
         pinMode(_LED_pin, OUTPUT);
@@ -60,5 +60,5 @@ private:
     Enviroment* _enviroment;
     int _LED_pin;
     
-    RTCController _rtc;
+    RealTime _rtc;
 };
