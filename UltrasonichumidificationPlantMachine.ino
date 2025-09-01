@@ -6,26 +6,38 @@
 #include "RealTime.h"
 #include "WaterSensor.h"
 #include "DashBoard.h"
+#include "fan.h"
+
+//출력 핀 (OUT PUT)
+
 //가습기 핀
 #define humidifier_pin 3
-//온습도 핀
-#define dht_pin 4
+
 //LED 핀
-#define led_pin 5
+#define led_pin 4
+
+//pumpPin
+//pwm 가능한 pin에만 연결
+#define motor_pin 5
+
+//fanPin
+#define fanPin 6
+
+//환경 데이터 핀 (INPUT)
+
+//온습도 핀
+#define dht_pin 7
+
+//수위 센서 핀
+#define WaterSensorPin 8
 
 //RTC Sensor 핀
 #define clk 11
 #define dat 12
 #define rst 13
 
-//수위 센서 핀
-#define WaterSensorPin 10
 
-//물 펌프 핀
-//pwm 가능한 pin에만 연결
-#define motor_pin 9
-//0~255
-#define motor_power 250
+static bool isFanOn = false;  // 팬의 현재 상태를 저장하는 변수
 
 //lcd pin 추가
 
@@ -45,27 +57,34 @@ Led led(&enviroment, led_pin, clk, dat, rst);
 //수위 센서 객체 생성
 WaterSensor waterSensor(WaterSensorPin);
 //펌프 컨트롤러 객체 생성
-WaterTankMotor waterTankMotor(motor_pin,motor_power);
+WaterTankMotor waterTankMotor(motor_pin);
 
 TempHumi tempHumi(dht_pin);
 
-DashBoard dashBoard(0x27,16,2);
+DashBoard dashBoard(0x27, 16, 2);
 
+Fan fan(fanPin);
 
 //millis 관련 코드 ------------------------------
 
-  unsigned long previous_ledTime = 0;
-  unsigned long previous_humidifierTime = 0;
-  unsigned long previous_waterTankTime = 0;
-  
-  const long interval_humidifierTime = 3000;
-  const long interval_ledTime = 5000;
-  const long interval_waterTankTime = 5000;
-  
-  unsigned long previous_DashBoardTime = 0;
-  
-  const long interval_DashBoardTime = 9000;
-  
+unsigned long previous_ledTime = 0;
+unsigned long previous_humidifierTime = 0;
+unsigned long previous_waterTankTime = 0;
+
+const long interval_humidifierTime = 3000;
+const long interval_ledTime = 5000;
+const long interval_waterTankTime = 5000;
+
+unsigned long previous_fanTime = 0;
+
+const long interval_fanTime = 10000;
+
+
+unsigned long previous_dashboardTime = 0;
+
+const long interval_dashboardTime = 1000;
+
+
 //millis 관련 코드-------------------------------
 
 void setup() {
@@ -89,58 +108,75 @@ void loop() {
   unsigned long currentMillis = millis();
 
   //시간에 따른 LED 제어
-  if(currentMillis-previous_ledTime >= interval_ledTime){
+  if (currentMillis - previous_ledTime >= interval_ledTime) {
     previous_ledTime = currentMillis;
     Serial.println("led 제어");
     led.control();
-
   }
 
-  if(currentMillis-previous_humidifierTime >= interval_humidifierTime){
+  if (currentMillis - previous_humidifierTime >= interval_humidifierTime) {
     previous_humidifierTime = currentMillis;
     plantSupplyWater.control();
   }
 
   //수위센서에 따른 물 펌프 제어
-  if(currentMillis-previous_waterTankTime >= interval_waterTankTime){
+  if (currentMillis - previous_waterTankTime >= interval_waterTankTime) {
     previous_waterTankTime = currentMillis;
-    
+
     //수위센서에 물이 닿지 않으면 motor ON
-    if(waterSensor.getTouchWater() == 0)
-    { //not touch : 0 , touch : 1
+    if (waterSensor.getTouchWater() == 1) {  //not touch : 0 , touch : 1
       waterTankMotor.turnOn();
-    //수위센서에 물이 닿으면 motor OFF
-    }else{ //20 ~ n
+      //수위센서에 물이 닿으면 motor OFF
+    } else {  //20 ~ n
       waterTankMotor.turnOff();
     }
-
   }
 
-  if(currentMillis-previous_DashBoardTime >= interval_DashBoardTime){
-    previous_DashBoardTime = currentMillis;
-    
-        // 센서 값을 읽어옴
-    tempHumi.readSensor();
-    float temp = tempHumi.getTemperature();
+
+
+  if (currentMillis - previous_fanTime >= interval_fanTime) {
+    previous_fanTime = currentMillis;
+
     float humi = tempHumi.getHumidity();
 
-    // LCD에 출력할 문자열 버퍼를 선언하고 충분한 크기로 확보
-    char tempBuffer[20];
-    char humiBuffer[20];
-    
-    // 온도를 문자열로 변환 (예: "Temp: 25.5 C")
-    sprintf(tempBuffer, "Temp: %.1f C", temp);
-    
-    // 습도를 문자열로 변환 (예: "Humi: 78.3 %")
-    sprintf(humiBuffer, "Humi: %.1f %%", humi);
-    // 참고: '%' 기호를 출력하려면 '%%'를 사용해야 합니다.
-
-    // 첫 번째 줄에 온도 출력
-    dashBoard.firstLinePrint(tempBuffer);
-    
-    // 두 번째 줄에 습도 출력
-    dashBoard.secondLinePrint(humiBuffer);
+    if (humi >= 85.0 && !isFanOn) {
+      fan.turnOn();
+      isFanOn = true;
+    } else if (humi <= 70.0 && isFanOn) {
+      fan.turnOff();
+      isFanOn = false;
+    }
   }
 
 
+  if (currentMillis - previous_dashboardTime >= interval_dashboardTime) {
+    previous_dashboardTime = currentMillis;
+    tempHumi.readSensor();
+    float humi = tempHumi.getHumidity();
+    Serial.println(humi);
+    // 습도 값을 담을 char 배열
+    char humiValueStr[10];
+    // 전체 문자열을 담을 char 배열
+    char fullString[20];
+
+    // dtostrf(변수, 최소너비, 소수점 자릿수, 배열)
+    // humi 변수의 값을 소수점 2자리까지 humiValueStr에 저장
+    dtostrf(humi, 4, 2, humiValueStr);
+
+    // dtostrf 변환 예시:
+    // humiValueStr은 "50.50" 문자열을 가짐
+
+    // strcat 함수로 두 문자열을 합치기
+    // 먼저 "습도: " 문자열을 fullString에 복사
+    strcpy(fullString, "humi: ");
+    // 이어서 humiValueStr 내용을 fullString에 추가
+    strcat(fullString, humiValueStr);
+    // 마지막으로 "%" 기호를 추가
+    strcat(fullString, "%");
+
+    // 완성된 문자열을 두 번째 줄에 출력
+    dashBoard.firstLinePrint(fullString);
+    
+
+  }
 }

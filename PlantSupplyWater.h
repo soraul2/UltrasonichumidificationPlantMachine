@@ -45,12 +45,14 @@ public:
     }
 
     void turnOn() {
-        digitalWrite(_humidifierPin, HIGH);
+        Serial.println("가습기 ON");
+        digitalWrite(_humidifierPin, LOW);
         // Serial.println("가습기 ON");
     }
 
     void turnOff() {
-        digitalWrite(_humidifierPin, LOW);
+        Serial.println("가습기 OFF");
+        digitalWrite(_humidifierPin, HIGH);
         // Serial.println("가습기 OFF");
     }
 

@@ -49,11 +49,11 @@ public:
     }
 
     void LED_turnOn() {
-        digitalWrite(_LED_pin, HIGH);
+        digitalWrite(_LED_pin, LOW);
     }
 
     void LED_turnOff() {
-        digitalWrite(_LED_pin, LOW);
+        digitalWrite(_LED_pin, HIGH);
     }
 
 private:

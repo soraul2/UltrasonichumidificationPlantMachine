@@ -5,15 +5,13 @@
 class WaterTankMotor{
 
   public :
-    WaterTankMotor(int motor_pin , int motor_power);
+    WaterTankMotor(int motor_pin);
       
     void turnOn();
     void turnOff();
 
   private : 
     int _motor_pin;
-    int _motor_power;
-
 };
 
 #endif
